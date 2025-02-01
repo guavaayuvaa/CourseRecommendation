@@ -54,14 +54,14 @@ const router = express.Router();
 // Register route
 router.post("/register", async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { username, email, password } = req.body;
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({ message: "User already exists" });
         }
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const newUser = new User({ name, email, password: hashedPassword });
+        const newUser = new User({ username, email, password: hashedPassword });
         const savedUser = await newUser.save();
         res.json({ message: "User registered successfully", user: savedUser });
     } catch (error) {

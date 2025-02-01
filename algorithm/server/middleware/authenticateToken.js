@@ -13,13 +13,10 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: 'No token provided' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid or expired token' });
-    }
+  jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
     req.user = user;
-    console.log(req.user)
-    console.log("in auth "+user)
+
     next();
   });
 };

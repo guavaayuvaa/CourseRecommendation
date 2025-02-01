@@ -57,6 +57,7 @@ export const saveUserCourse = async (course, userEmail) => {
 export const getSavedCourses = async (userEmail) => {
   try {
     const savedCourses = await Course.find({ userId: userEmail })
+    console.log(savedCourses)
     return { success: true, courses: savedCourses }
   } catch (error) {
     console.error("Error fetching saved courses:", error)

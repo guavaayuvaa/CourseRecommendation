@@ -290,7 +290,7 @@ const LandingPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Ensure proper format
+          Authorization: `Bearer ${token}`, 
         },
         body: JSON.stringify({ course }),
       });
@@ -300,7 +300,7 @@ const LandingPage = () => {
 
       if (response.ok) {
         console.log("Course saved successfully");
-        // Fetch saved courses to update the list
+        
         await fetchSavedCourses();
       } else {
         setError(data.message || "Failed to save course");
@@ -320,7 +320,7 @@ const LandingPage = () => {
 
     try {
       const response = await fetch(`${nodeAPI}/courses/saved`, {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -334,10 +334,12 @@ const LandingPage = () => {
       } else {
         console.error("Failed to fetch saved courses:", data.message);
         setError(data.message || "Failed to fetch saved courses");
+        console.log(savedCourses)
       }
     } catch (error) {
       console.error("Error fetching saved courses:", error);
       setError("Error fetching saved courses");
+      console.log(savedCourses)
     }
   };
 

@@ -35,22 +35,44 @@ def getSimilaritymat(vectors):
     similarity = cosine_similarity(vectors)
     return similarity
 
+
+
 def recommend(df, title_name, similarity_mat, no_of_records=10):
     try:
-        course_index = pd.Series(df.index, index=df['title'])
+        # Create index lookup
+        course_index = pd.Series(df.index, index=df['title']).drop_duplicates()
+
+        # Check if title_name exists
+        if title_name not in course_index:
+            print(f"Course '{title_name}' not found.")
+            return pd.DataFrame()
+
         index = course_index[title_name]
         scores = list(enumerate(similarity_mat[index]))
+
+        # Sort courses by similarity score (descending order)
         sorted_scores = sorted(scores, key=lambda x: x[1], reverse=True)
+
+        # Select the top recommendations
         selected_course_index = [i[0] for i in sorted_scores[1:no_of_records+1]]
         selected_course_score = [i[1] for i in sorted_scores[1:no_of_records+1]]
-        rec_df = df.iloc[selected_course_index]
-        rec_df['similarity_score'] = selected_course_score
+
+        rec_df = df.iloc[selected_course_index].copy()  # Use `.copy()` to avoid SettingWithCopyWarning
+        rec_df.loc[:, 'similarity_score'] = selected_course_score  # Use `.loc` for safe assignment
+
         final_rec_courses = rec_df[['title', 'is_paid', 'price', 'course_cover_image', 'headline',
                                     'instructor', 'ratings', 'similarity_score']]
-        final_rec_courses = final_rec_courses[final_rec_courses.similarity_score > 0.5]
+
+        # Filter courses with similarity score > 0.5
+        if final_rec_courses['similarity_score'].max() > 0.5:
+            final_rec_courses = final_rec_courses[final_rec_courses['similarity_score'] > 0.5]
+        
         return final_rec_courses
-    except KeyError:
+
+    except Exception as e:
+        print(f"Error in recommend function: {e}")
         return pd.DataFrame()
+
 
 def searchterm(term, df):
     result_df = df[df['tags'].str.contains(term, na=False)]
